@@ -1,0 +1,126 @@
+// ==UserScript==
+// @name         Comic Fullscreen Reader
+// @namespace    comicfullscreen
+// @version      1.0
+// @description  Fullscreen comic mode
+// @match        *://readcomiconline.li/*
+// @match        *://*.readcomiconline.li/*
+// @grant        none
+// ==/UserScript==
+
+(function () {
+    'use strict';
+
+    function setup() {
+
+        // ===== FULLSCREEN BUTTON =====
+        const btn = document.createElement('button');
+        btn.innerText = '⛶ Fullscreen';
+
+        Object.assign(btn.style, {
+            position: 'fixed',
+            top: '10px',
+            right: '10px',
+            zIndex: '999999',
+            padding: '10px 14px',
+            background: '#111',
+            color: '#fff',
+            border: '1px solid #444',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontSize: '16px'
+        });
+
+        document.body.appendChild(btn);
+
+        // ===== FULLSCREEN FUNCTION =====
+        function toggleFullscreen() {
+
+            const comic = document.querySelector('#divImage');
+
+            if (!document.fullscreenElement) {
+
+                if (comic.requestFullscreen) {
+                    comic.requestFullscreen();
+                }
+
+            } else {
+
+                document.exitFullscreen();
+
+            }
+        }
+
+        btn.onclick = toggleFullscreen;
+
+        // ===== HOTKEY =====
+        document.addEventListener('keydown', (e) => {
+
+            // Ignore typing in inputs
+            if (
+                document.activeElement.tagName === 'INPUT' ||
+                document.activeElement.tagName === 'TEXTAREA'
+            ) return;
+
+            if (e.key.toLowerCase() === 'f') {
+                toggleFullscreen();
+            }
+        });
+
+        // ===== FULLSCREEN STYLING =====
+        const style = document.createElement('style');
+
+        style.textContent = `
+
+            /* Hide clutter */
+            #head,
+            #headnav,
+            iframe,
+            .divCloseBut,
+            #navbar,
+            #search,
+            .banner,
+            .btnZoom-container {
+                display: none !important;
+            }
+
+            /* Center comic */
+            #divImage {
+                text-align: center !important;
+                background: black !important;
+            }
+
+            /* Fullscreen container */
+            #divImage:fullscreen {
+                width: 100vw !important;
+                height: 100vh !important;
+                overflow: auto !important;
+                background: black !important;
+            }
+
+            /* Comic image */
+            #divImage img {
+                max-width: 100% !important;
+                height: auto !important;
+                zoom: 100% !important;
+                margin: auto !important;
+                display: block !important;
+            }
+
+            /* Fullscreen image */
+            #divImage:fullscreen img {
+                max-height: 100vh !important;
+                width: auto !important;
+                margin: auto !important;
+            }
+
+        `;
+
+        document.head.appendChild(style);
+
+        console.log('Comic Fullscreen Loaded');
+    }
+
+    window.addEventListener('load', setup);
+
+})();
