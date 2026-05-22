@@ -1,0 +1,72 @@
+// ==UserScript==
+// @name         AI Music MP3 Downloader
+// @namespace    mp3-downloader
+// @version      1.0
+// @description  Adds an MP3 download button to the audio player
+// @match        https://ai-music-generator.ai/*
+// @grant        none
+// ==/UserScript==
+
+(function () {
+    "use strict";
+
+    function getFileName() {
+        const title =
+            document.querySelector("h1")?.innerText ||
+            document.title ||
+            "download";
+
+        return title
+            .replace(/[\\/:*?"<>|]/g, "")
+            .trim() + ".mp3";
+    }
+
+    function addDownloadButton(audio) {
+        if (!audio || !audio.src) return;
+        if (document.getElementById("tm-mp3-download-btn")) return;
+
+        const btn = document.createElement("button");
+        btn.id = "tm-mp3-download-btn";
+        btn.textContent = "Download MP3";
+
+        btn.style.position = "fixed";
+        btn.style.right = "20px";
+        btn.style.bottom = "20px";
+        btn.style.zIndex = "999999";
+        btn.style.padding = "12px 18px";
+        btn.style.borderRadius = "10px";
+        btn.style.border = "none";
+        btn.style.background = "#0ea5e9";
+        btn.style.color = "white";
+        btn.style.fontSize = "16px";
+        btn.style.fontWeight = "bold";
+        btn.style.cursor = "pointer";
+        btn.style.boxShadow = "0 4px 12px rgba(0,0,0,0.35)";
+
+        btn.onclick = function () {
+            const a = document.createElement("a");
+            a.href = audio.src;
+            a.download = getFileName();
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        };
+
+        document.body.appendChild(btn);
+    }
+
+    function scanForAudio() {
+        const audio = document.querySelector("audio[src]");
+        if (audio) {
+            addDownloadButton(audio);
+        }
+    }
+
+    scanForAudio();
+
+    const observer = new MutationObserver(scanForAudio);
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+})();
